@@ -300,7 +300,10 @@ public final class SignClient: SignClientProtocol {
         topic: String
     ) async throws {
         try pairingClient.validatePairingExistance(topic)
-        try pairingClient.validateMethodSupport(topic: topic, method: SessionAuthenticatedProtocolMethod().method)
+        try pairingClient.validateMethodSupport(
+            topic: topic,
+            method: SessionAuthenticatedProtocolMethod.responseApprove().method
+        )
         logger.debug("Requesting Authentication on existing pairing")
         try await appRequestService.request(params: params, topic: topic)
 
@@ -318,7 +321,9 @@ public final class SignClient: SignClientProtocol {
     public func authenticate(
         _ params: AuthRequestParams
     ) async throws -> WalletConnectURI {
-        let pairingURI = try await pairingClient.create(methods: [SessionAuthenticatedProtocolMethod().method])
+        let pairingURI = try await pairingClient.create(
+            methods: [SessionAuthenticatedProtocolMethod.responseApprove().method]
+        )
         logger.debug("Requesting Authentication on existing pairing")
         try await appRequestService.request(params: params, topic: pairingURI.topic)
 

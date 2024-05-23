@@ -36,7 +36,7 @@ class AuthRequestSubscriber {
     }
 
     private func subscribeForRequest() {
-        pairingRegisterer.register(method: SessionAuthenticatedProtocolMethod())
+        pairingRegisterer.register(method: SessionAuthenticatedProtocolMethod.responseApprove())
             .sink { [unowned self] (payload: RequestSubscriptionPayload<SessionAuthenticateRequestParams>) in
 
                 guard !payload.request.isExpired() else {
@@ -73,7 +73,12 @@ class AuthRequestSubscriber {
     func respondError(payload: SubscriptionPayload, reason: SignReasonCode) {
         Task(priority: .high) {
             do {
-                try await networkingInteractor.respondError(topic: payload.topic, requestId: payload.id, protocolMethod: SessionAuthenticatedProtocolMethod(), reason: reason)
+                try await networkingInteractor.respondError(
+                    topic: payload.topic,
+                    requestId: payload.id,
+                    protocolMethod: SessionAuthenticatedProtocolMethod.responseApprove(),
+                    reason: reason
+                )
             } catch {
                 logger.error("Respond Error failed with: \(error.localizedDescription)")
             }
